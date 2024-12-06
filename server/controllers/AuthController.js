@@ -1,6 +1,7 @@
 import { compare } from "bcrypt";
 import User from "../model/UserModel.js";
 import jwt from "jsonwebtoken";
+import { response } from "express";
 
 const maxLife = 3 * 24 * 60 * 60 * 1000;
 
@@ -80,7 +81,6 @@ export const getUserController = async (req, res, next) => {
 
     if(!userdata)return res.status(404).send("No user with provided Id");
     return res.status(200).json({
-      user: {
         id: userdata.id,
         email: userdata.email,
         profileSetup: userdata.profileSetup,
@@ -88,7 +88,32 @@ export const getUserController = async (req, res, next) => {
         lastName: userdata.lastname,
         image: userdata.image,
         color: userdata.color,
-      },
+    });
+  } catch (e) {
+    return res.status(500).send("Internal Server Error");
+  }
+};
+
+export const updateProfileController= async (req, res, next) => {
+  try {
+    
+    const {id ,firstName , lastName , color} = req.body;
+    if(!firstName || !lastName || color === undefined){
+      return response.status(400).send("Firstname Lastname , color required")
+    }
+    const userdata = await User.findByIdAndUpdate(id , {
+      firstname : firstName ,lastname :  lastName , color : color , profileSetup : true
+    } , {new:true , runValidators : true});
+
+    if(!userdata)return res.status(404).send("No user with provided Id");
+    return res.status(200).json({
+        id: userdata.id,
+        email: userdata.email,
+        profileSetup: userdata.profileSetup,
+        firstName: userdata.firstname,
+        lastName: userdata.lastname,
+        image: userdata.image,
+        color: userdata.color,
     });
   } catch (e) {
     return res.status(500).send("Internal Server Error");

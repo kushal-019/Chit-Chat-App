@@ -2,7 +2,7 @@ import express from "express";
 import {
     getUserController,
   loginController,
-  signupController,
+  signupController,updateProfileController
 } from "../controllers/AuthController.js";
 import { verifyToken } from "../middleware/AuthMiddleware.js";
 
@@ -10,6 +10,7 @@ const AuthRouter = express.Router();
 
 AuthRouter.post("/signup", signupController);
 AuthRouter.post("/login", loginController);
-AuthRouter.post("/user-info", verifyToken,getUserController);
+AuthRouter.get("/user-info", verifyToken,getUserController);
+AuthRouter.post("/update-profile", verifyToken,updateProfileController);
 
 export default AuthRouter;

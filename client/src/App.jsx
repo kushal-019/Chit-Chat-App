@@ -8,14 +8,15 @@ import { useEffect, useState } from "react";
 import { apiClient } from "./lib/api-client";
 import { GET_USER_INFO } from "./Utils/constants";
 
-const privateRoute = ({ children }) => {
+const PrivateRoute = ({ children }) => {
   const { userInfo } = useAppStore();
-  const isAuthenticated = !userInfo;
+  const isAuthenticated = userInfo;
+  console.log(userInfo)
   return isAuthenticated ? children : <Navigate to="/auth" />
 }
 const AuthRoute = ({ children }) => {
   const { userInfo } = useAppStore();
-  const isAuthenticated = !userInfo;
+  const isAuthenticated = userInfo;
   return isAuthenticated ? <Navigate to="/chat" /> : children
 }
 
@@ -29,9 +30,15 @@ function App() {
       try {
         const res = await apiClient.get(GET_USER_INFO , {withCredentials :true})
       console.log(res);
-        
+        if(res.status === 200 && res.data.id){
+          setUserInfo(res.data);
+        }
+        else setUserInfo(undefined)
       } catch (error) {
-        
+        setUserInfo(undefined)
+      }
+      finally{
+        setLoading(false);
       }
       }
     if(!userInfo){
@@ -51,13 +58,13 @@ function App() {
           </AuthRoute>
         } />
         <Route path="/profile" element={
-          <privateRoute>
+          <PrivateRoute>
             <Profile />
-          </privateRoute>
+          </PrivateRoute>
         } />
-        <Route path="/chat" element={<privateRoute>
+        <Route path="/chat" element={<PrivateRoute>
           <Chat />
-        </privateRoute>} />
+        </PrivateRoute>} />
         <Route path="*" element={<Auth />} />
       </Routes>
     </>
