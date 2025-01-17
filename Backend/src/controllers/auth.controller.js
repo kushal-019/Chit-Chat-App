@@ -1,3 +1,4 @@
+import cloudinary from "../lib/cloudinary.js";
 import { genrateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
@@ -21,7 +22,7 @@ export const loginController = async (req, res) => {
       return res.status(400).json({
         message: "Invalid credentials",
       });
-    } 
+    }
     genrateToken(user._id, res);
 
     return res.status(200).json({
@@ -93,6 +94,35 @@ export const logoutController = async (req, res) => {
   }
 };
 
-export const updateProfileController=async(req,res)=>{
+export const updateProfileController = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+    const userId = req.user._id;
 
-}
+    if (!profilePic) {
+      return res.status(400).json({ message: "No profile pic provided" });
+    }
+
+    const uploadedImage = await cloudinary.uploader.upload(profilePic);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadedImage.secure_url },
+      { new: true }
+    );
+
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log("Profile Picture Error : ", error.message);
+    return res.status(500).json({ message: "Internal server Error" });
+  }
+};
+
+export const checkAuth = (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth controller : ", error.message);
+    return res.status(500).json({ message: "Internal server Error" });
+  }
+};
