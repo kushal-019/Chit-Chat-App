@@ -1,13 +1,48 @@
-import { genrateToken } from "../lib/utils";
-import User from "../models/user.model";
-import bcrypt from "bcrypt";
-export const loginController = (req, res) => {
-  res.send("login");
+import { genrateToken } from "../lib/utils.js";
+import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+
+export const loginController = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    }
+
+    // Checking password with hashed password
+    const isCorrPass = await bcrypt.compare(password, user.password);
+
+    if (!isCorrPass) {
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    } 
+    genrateToken(user._id, res);
+
+    return res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.log("Error in login controller", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
+
 export const signupController = async (req, res) => {
   const { fullName, email, password } = req.body;
   try {
     // Checking input and required constraints
+    if (!email || !password || !fullName) {
+      return res.status(400).json({ message: "All input fields required" });
+    }
     if (password < 6) {
       return res
         .status(400)
@@ -43,11 +78,21 @@ export const signupController = async (req, res) => {
       return res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
-    console.log("Error in signing up" , error.message);
+    console.log("Error in signing up", error.message);
 
-    return res.status(500).json({message : "Internal server error"});
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
-export const logoutController = (req, res) => {
-  res.send("logout");
+
+export const logoutController = async (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    return res.status(200).json({ message: "User Logged out" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
+
+export const updateProfileController=async(req,res)=>{
+
+}
