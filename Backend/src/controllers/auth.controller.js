@@ -1,7 +1,7 @@
 import cloudinary from "../lib/cloudinary.js";
 import { genrateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 export const loginController = async (req, res) => {
   const { email, password } = req.body;
