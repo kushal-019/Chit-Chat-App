@@ -8,15 +8,17 @@ import MessageInput from './MessageInput.jsx';
 import { useAuthStore } from '../Store/useAuthStore.jsx';
 const ChatContainer = () => {
 
-  const { messages, getMessages, isMessageLoading, selectedUser } = useChatStore();
-  const {authUser, checkAuth} = useAuthStore();
-
+  const { messages, getMessages, isMessageLoading, selectedUser, subscribeToMsgs, unsubscribeFromMsgs } = useChatStore();
+  const { authUser } = useAuthStore();
   const messageRef = useRef(null);
   const cutName = selectedUser.fullName.split(" ");
 
   useEffect(() => {
     getMessages(selectedUser._id);
-  }, [selectedUser._id, getMessages]);
+    subscribeToMsgs();
+
+    return () => unsubscribeFromMsgs();
+  }, [selectedUser._id, getMessages, unsubscribeFromMsgs, subscribeToMsgs]);
 
   useEffect(() => {
     if (messageRef.current && messages) {

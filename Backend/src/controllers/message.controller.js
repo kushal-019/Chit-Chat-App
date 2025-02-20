@@ -1,4 +1,6 @@
+import { io } from "../lib/socket.js";
 import cloudinary from "../lib/cloudinary.js";
+import { FindsocketId } from "../lib/socket.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
@@ -61,7 +63,10 @@ export const sendMessagesController = async (req, res) => {
     });
     await newmsg.save();
 
-    // todo : realtime funtionality of chat Socket.io
+    const receiverSocketId = FindsocketId(receiverId);
+    if(receiverSocketId){
+      io.to(receiverSocketId).emit("newmsg" , newmsg);
+    }
 
     return res.status(200).json(newmsg);
   } catch (error) {

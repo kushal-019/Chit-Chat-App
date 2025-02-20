@@ -62,7 +62,7 @@ const SignUpPage = () => {
                   className={`input input-bordered w-full pl-10`}
                   placeholder="John Doe"
                   value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value.toUpperCase()
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1)
                   })}
                 />
               </div>
@@ -81,7 +81,7 @@ const SignUpPage = () => {
                   className={`input input-bordered w-full pl-10`}
                   placeholder="you@example.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value.toUpperCase()
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1)
                   })}
                 />
               </div>
