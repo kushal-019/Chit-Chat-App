@@ -1,5 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
-import { genrateToken } from "../lib/utils.js";
+import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 
@@ -23,7 +23,7 @@ export const loginController = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    genrateToken(user._id, res);
+    generateToken(user._id, res);
 
     return res.status(200).json({
       _id: user._id,
@@ -66,7 +66,7 @@ export const signupController = async (req, res) => {
     });
 
     if (newUser) {
-      genrateToken(newUser._id, res);
+      generateToken(newUser._id, res);
       await newUser.save();
 
       return res.status(201).json({
